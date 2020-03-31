@@ -1,0 +1,48 @@
+{
+    "type": "customSql",
+    "input": [
+        {
+            "name": "selectAttendanceInput",
+            "type": "model",
+            "gloopProperties": [
+                {
+                    "name": "$martiniConnectionPool"
+                },
+                {
+                    "name": "id"
+                }
+            ]
+        }
+    ],
+    "output": [
+        {
+            "name": "selectAttendanceOutput",
+            "type": "model",
+            "gloopProperties": [
+                {
+                    "name": "ID",
+                    "required": true,
+                    "allowNull": false
+                },
+                {
+                    "name": "USER_ID",
+                    "required": true,
+                    "allowNull": false
+                },
+                {
+                    "name": "TYPE",
+                    "required": true,
+                    "allowNull": false
+                },
+                {
+                    "name": "RECORD_TIMESTAMP",
+                    "type": "date",
+                    "required": true
+                }
+            ]
+        }
+    ],
+    "connectionPoolName": "mock_timesheet_api",
+    "sqlType": "SELECT_SINGLE",
+    "query": "SELECT *\nFROM\n    \"ATTENDANCE\"\nWHERE (\n    \"ID\" = :id\n)"
+}

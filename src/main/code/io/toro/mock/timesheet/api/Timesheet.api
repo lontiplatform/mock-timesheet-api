@@ -1,0 +1,319 @@
+{
+    "info": {
+        "title": "Mock Timesheet API",
+        "description": "A mock timesheet API.",
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0-SNAPSHOT"
+    },
+    "basePath": "/mock-timesheet-api",
+    "paths": {
+        "/users": {
+            "description": "Users endpoint for viewing creating users and viewing users list.",
+            "get": {
+                "summary": "Retrieves all users.",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "body": "users",
+                        "description": "Returns a list of users."
+                    },
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the default response."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.user.ListUsers",
+                "responseCodeField": "responseCode"
+            },
+            "post": {
+                "summary": "Creates a single user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "bodyParameter": {
+                    "name": "user",
+                    "description": "The user data."
+                },
+                "responses": {
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the status of the user creation."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.user.CreateUser",
+                "responseCodeField": "responseCode"
+            }
+        },
+        "/users/{userId}": {
+            "description": "User endpoint for viewing, updating, and deleting a specific user.",
+            "get": {
+                "summary": "Fetches a single user.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "type": "PATH",
+                        "description": "The ID of the user to fetch."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "body": "user",
+                        "description": "Returns information about the user."
+                    },
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the error response."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.user.GetUser",
+                "responseCodeField": "responseCode"
+            },
+            "put": {
+                "summary": "Updates a single user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "type": "PATH",
+                        "description": "The ID of the user to update."
+                    }
+                ],
+                "bodyParameter": {
+                    "name": "user",
+                    "description": "The new user data to replace the current one."
+                },
+                "responses": {
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the status of the user update."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.user.UpdateUser",
+                "responseCodeField": "responseCode"
+            },
+            "delete": {
+                "summary": "Deletes a single user.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "type": "PATH",
+                        "description": "The ID of the user to delete."
+                    }
+                ],
+                "responses": {
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the status of the user deletion."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.user.DeleteUser",
+                "responseCodeField": "responseCode"
+            }
+        },
+        "/users/{userId}/attendance": {
+            "description": "User endpoint for creating and viewing a specific user's attendance records.",
+            "get": {
+                "summary": "Fetches the user's attendance.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "type": "PATH",
+                        "description": "The ID of the user whose attendance to fetch."
+                    },
+                    {
+                        "name": "startDate",
+                        "type": "QUERY",
+                        "description": "Fetch attendance starting from this date."
+                    },
+                    {
+                        "name": "endDate",
+                        "type": "QUERY",
+                        "description": "Fetch attandance until this date."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "body": "attendance",
+                        "description": "Returns the list of user attendance."
+                    },
+                    "-1": {
+                        "body": "error",
+                        "description": "Returns the error response."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.attendance.ListUserAttendanceInPeriod",
+                "responseCodeField": "responseCode"
+            },
+            "post": {
+                "summary": "Creates a record of the user's attendance.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "type": "PATH",
+                        "description": "The user ID whose attendance will be recorded."
+                    }
+                ],
+                "bodyParameter": {
+                    "name": "attendance",
+                    "description": "The attendance data to create."
+                },
+                "responses": {
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the status of the user attendance creation."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.attendance.CreateAttendance",
+                "responseCodeField": "responseCode"
+            }
+        },
+        "/attendance": {
+            "description": "Attendance endpoint for viewing a list of attendance records.",
+            "get": {
+                "summary": "Fetches a list of attendance records.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "startDate",
+                        "type": "QUERY",
+                        "description": "Fetch attendance records starting from this date."
+                    },
+                    {
+                        "name": "endDate",
+                        "type": "QUERY",
+                        "description": "Fetch attendance records until this date."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "body": "attendance",
+                        "description": "Returns the list of attendance."
+                    },
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the error response."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.attendance.ListAttendanceInPeriod",
+                "responseCodeField": "responseCode"
+            }
+        },
+        "/attendance/{id}": {
+            "description": "Attendance endpoint for viewing, updating, and deleting a specific attendance record.",
+            "get": {
+                "summary": "Fetches a single attendance record.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "PATH",
+                        "description": "The ID of the attendance record to fetch."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "body": "attendance",
+                        "description": "Returns the details about the attendance."
+                    },
+                    "-1": {
+                        "body": "error",
+                        "description": "Returns the error response.\n"
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.attendance.GetAttendance",
+                "responseCodeField": "responseCode"
+            },
+            "put": {
+                "summary": "Updates a single attendance record.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "PATH",
+                        "description": "The ID of the attendance record to update."
+                    }
+                ],
+                "bodyParameter": {
+                    "name": "attendance",
+                    "description": "The new data of the attendance record to replace the current one."
+                },
+                "responses": {
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the status of the attendance update."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.attendance.UpdateAttendance",
+                "responseCodeField": "responseCode"
+            },
+            "delete": {
+                "summary": "Deletes a single attendance record.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "PATH",
+                        "description": "The ID of the attendance record to delete."
+                    }
+                ],
+                "responses": {
+                    "-1": {
+                        "body": "response",
+                        "description": "Returns the status of the attendance deletion."
+                    }
+                },
+                "operationType": "gloop",
+                "operationLocation": "io.toro.mock.timesheet.api.controller.attendance.DeleteAttendance",
+                "responseCodeField": "responseCode"
+            }
+        }
+    },
+    "externalDocumentation": {
+        "url": "http://example.com"
+    }
+}

@@ -1,0 +1,278 @@
+{
+    "comments": "This service initializes the database to be used by the mock timesheet API.",
+    "steps": [
+        {
+            "type": "block",
+            "blockType": "TRY_CATCH",
+            "children": [
+                {
+                    "type": "fork",
+                    "expression": "'database.type'.getPackageProperty().equalsIgnoreCase( 'oracle' )",
+                    "children": [
+                        {
+                            "type": "invokeCode",
+                            "label": "true",
+                            "className": "io.toro.martini.GloopMethods",
+                            "methodName": "setSystemProperty",
+                            "parameters": [
+                                "java.lang.String",
+                                "java.lang.String"
+                            ],
+                            "inputs": [
+                                {
+                                    "type": "set",
+                                    "expression": "oracle.jdbc.J2EE13Compliant",
+                                    "to": [
+                                        "name"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "true",
+                                    "to": [
+                                        "value"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "invokeCode",
+                    "comments": "check if the needed connection pool already exists",
+                    "declare": [
+                        {
+                            "variables": [
+                                {
+                                    "name": "hasConnection",
+                                    "type": "boolean",
+                                    "allowNull": false
+                                }
+                            ]
+                        }
+                    ],
+                    "className": "io.toro.martini.DatabaseConnectionPoolMethods",
+                    "methodName": "containsConnectionWithName",
+                    "parameters": [
+                        "java.lang.String"
+                    ],
+                    "inputs": [
+                        {
+                            "type": "set",
+                            "expression": "mock_timesheet_api",
+                            "to": [
+                                "name"
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "from": [
+                                "output"
+                            ],
+                            "to": [
+                                "hasConnection"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "fork",
+                    "expression": "!hasConnection",
+                    "children": [
+                        {
+                            "type": "block",
+                            "label": "true",
+                            "comments": "if it does not yet exist, create a new one",
+                            "children": [
+                                {
+                                    "comments": "fetch the database type from the package properties",
+                                    "declare": [
+                                        {
+                                            "variables": [
+                                                {
+                                                    "name": "database"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "lines": [
+                                        {
+                                            "type": "set",
+                                            "expression": "'database.type'.getPackageProperty( 'hsql' )",
+                                            "evaluate": true,
+                                            "to": [
+                                                "database"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "invokeCode",
+                                    "comments": "create the needed connection pool",
+                                    "className": "io.toro.martini.DatabaseConnectionPoolMethods",
+                                    "methodName": "savePool",
+                                    "parameters": [
+                                        "io.toro.gloop.object.property.GloopModel"
+                                    ],
+                                    "inputs": [
+                                        {
+                                            "type": "set",
+                                            "expression": "mock_timesheet_api",
+                                            "to": [
+                                                "connectionPoolInfo",
+                                                "name"
+                                            ]
+                                        },
+                                        {
+                                            "type": "set",
+                                            "expression": "true",
+                                            "to": [
+                                                "connectionPoolInfo",
+                                                "enabled"
+                                            ]
+                                        },
+                                        {
+                                            "type": "set",
+                                            "expression": "false",
+                                            "to": [
+                                                "connectionPoolInfo",
+                                                "xa"
+                                            ]
+                                        },
+                                        {
+                                            "type": "set",
+                                            "expression": "\"${database}.driver\".getPackageProperty()",
+                                            "evaluate": true,
+                                            "to": [
+                                                "connectionPoolInfo",
+                                                "driverClass"
+                                            ]
+                                        },
+                                        {
+                                            "type": "set",
+                                            "expression": "\"${database}.connection.url\".getPackageProperty()",
+                                            "evaluate": true,
+                                            "to": [
+                                                "connectionPoolInfo",
+                                                "url"
+                                            ]
+                                        },
+                                        {
+                                            "type": "set",
+                                            "expression": "\"${database}.username\".getPackageProperty()",
+                                            "evaluate": true,
+                                            "to": [
+                                                "connectionPoolInfo",
+                                                "username"
+                                            ]
+                                        },
+                                        {
+                                            "type": "set",
+                                            "expression": "\"${database}.password\".getPackageProperty()",
+                                            "evaluate": true,
+                                            "to": [
+                                                "connectionPoolInfo",
+                                                "password"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "invokeCode",
+                                    "comments": "start the newly created connection pool",
+                                    "className": "io.toro.martini.DatabaseConnectionPoolMethods",
+                                    "methodName": "startPool",
+                                    "parameters": [
+                                        "java.lang.String"
+                                    ],
+                                    "inputs": [
+                                        {
+                                            "type": "set",
+                                            "expression": "mock_timesheet_api",
+                                            "to": [
+                                                "name"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "invokeCode",
+                    "comments": "initialize the database tables",
+                    "className": "io.toro.martini.SqlMethods",
+                    "methodName": "sql",
+                    "parameters": [
+                        "java.lang.String",
+                        "groovy.lang.Closure"
+                    ],
+                    "inputs": [
+                        {
+                            "type": "set",
+                            "expression": "mock_timesheet_api",
+                            "to": [
+                                "poolName"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "{ sql ->\n\tsql.execute( '''\n\t\tCREATE TABLE \"USERS\" (\n\t\t\t\"ID\" VARCHAR(50) PRIMARY KEY,\n\t\t\t\"NAME\" VARCHAR(100) NOT NULL\n\t\t);\n\t\n\t\tCREATE TABLE \"ATTENDANCE\" (\n\t\t\t\"ID\" VARCHAR(50) PRIMARY KEY NOT NULL,\n\t\t\t\"USER_ID\" VARCHAR(50) NOT NULL,\n\t\t\t\"TYPE\" VARCHAR(20) NOT NULL,\n\t\t\t\"RECORD_TIMESTAMP\" DATETIME DEFAULT CURRENT_TIMESTAMP\n\t\t);\n\t''' )\n}",
+                            "evaluate": true,
+                            "to": [
+                                "c"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "fork",
+                    "comments": "check if debug mode is enabled",
+                    "expression": "'debug.enabled'.getPackageProperty()",
+                    "children": [
+                        {
+                            "type": "invokeGloop",
+                            "label": "true",
+                            "comments": "if debug mode is enabled, populate the database with mock data",
+                            "name": "io.toro.mock.timesheet.config.PopulateDatabase"
+                        }
+                    ]
+                }
+            ],
+            "catch": [
+                {
+                    "type": "invokeCode",
+                    "comments": "log the exception received",
+                    "className": "io.toro.martini.LoggerMethods",
+                    "methodName": "error",
+                    "parameters": [
+                        "java.lang.String",
+                        "java.lang.Throwable"
+                    ],
+                    "inputs": [
+                        {
+                            "from": [
+                                "$gloopException",
+                                "gloopStackTrace"
+                            ],
+                            "to": [
+                                "message"
+                            ]
+                        },
+                        {
+                            "from": [
+                                "$gloopException",
+                                "realException"
+                            ],
+                            "to": [
+                                "throwable"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

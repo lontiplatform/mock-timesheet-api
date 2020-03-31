@@ -1,0 +1,33 @@
+{
+    "type": "customSql",
+    "input": [
+        {
+            "name": "updateAttendanceInput",
+            "type": "model",
+            "gloopProperties": [
+                {
+                    "name": "$martiniConnectionPool"
+                },
+                {
+                    "name": "type"
+                },
+                {
+                    "name": "recordTimestamp",
+                    "type": "date"
+                },
+                {
+                    "name": "id"
+                }
+            ]
+        }
+    ],
+    "output": [
+        {
+            "name": "updateCount",
+            "type": "integer"
+        }
+    ],
+    "connectionPoolName": "mock_timesheet_api",
+    "sqlType": "UPDATE",
+    "query": "UPDATE \"ATTENDANCE\"\nSET\n    \"TYPE\" = COALESCE( :type, \"TYPE\" ),\n    \"RECORD_TIMESTAMP\" = COALESCE( :recordTimestamp, \"RECORD_TIMESTAMP\" )\nWHERE (\n    \"ID\" = :id\n)"
+}

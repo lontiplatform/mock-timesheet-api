@@ -1,0 +1,11 @@
+{
+    "name": "User",
+    "type": "model",
+    "comments": "The timesheet user model",
+    "gloopProperties": [
+        {
+            "name": "name",
+            "comments": "the name of the user"
+        }
+    ]
+}

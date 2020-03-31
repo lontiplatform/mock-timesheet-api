@@ -1,0 +1,46 @@
+{
+    "type": "customSql",
+    "input": [
+        {
+            "name": "insertAttendanceInput",
+            "type": "model",
+            "gloopProperties": [
+                {
+                    "name": "$martiniConnectionPool"
+                },
+                {
+                    "name": "$getGeneratedKeys",
+                    "type": "boolean",
+                    "defaultValue": false
+                },
+                {
+                    "name": "id"
+                },
+                {
+                    "name": "userId"
+                },
+                {
+                    "name": "type"
+                },
+                {
+                    "name": "recordTimestamp",
+                    "type": "date"
+                }
+            ]
+        }
+    ],
+    "output": [
+        {
+            "name": "updateCount",
+            "type": "integer"
+        },
+        {
+            "name": "generatedKeys",
+            "type": "model",
+            "allowExtraProperties": true
+        }
+    ],
+    "connectionPoolName": "mock_timesheet_api",
+    "sqlType": "INSERT",
+    "query": "INSERT INTO \"ATTENDANCE\" (\n    \"ID\",\n    \"USER_ID\",\n    \"TYPE\",\n    \"RECORD_TIMESTAMP\"\n)\nVALUES (\n    :id,\n    :userId,\n    :type,\n    :recordTimestamp\n)"
+}

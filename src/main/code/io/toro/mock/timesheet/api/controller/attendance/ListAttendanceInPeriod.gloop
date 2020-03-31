@@ -1,0 +1,244 @@
+{
+    "comments": "This service lists attendance records within the given period.",
+    "input": [
+        {
+            "name": "startDate",
+            "type": "date"
+        },
+        {
+            "name": "endDate",
+            "type": "date"
+        }
+    ],
+    "output": [
+        {
+            "name": "attendance",
+            "type": "model",
+            "array": true,
+            "reference": "io.toro.mock.timesheet.model.attendance.Attendance",
+            "gloopProperties": [
+                {
+                    "name": "id"
+                },
+                {
+                    "name": "userId"
+                }
+            ]
+        },
+        {
+            "name": "response",
+            "type": "model",
+            "reference": "io.toro.mock.timesheet.model.APIResponse"
+        },
+        {
+            "name": "responseCode",
+            "type": "integer"
+        }
+    ],
+    "steps": [
+        {
+            "type": "block",
+            "blockType": "TRY_CATCH",
+            "children": [
+                {
+                    "type": "invokeGloop",
+                    "comments": "fetch the attendance records from the database",
+                    "name": "io.toro.mock.timesheet.sql.attendance.SelectAllAttendanceInPeriod",
+                    "declare": [
+                        {
+                            "variables": [
+                                {
+                                    "name": "attendanceCursor",
+                                    "type": "model",
+                                    "array": true,
+                                    "gloopProperties": [
+                                        {
+                                            "name": "ID",
+                                            "required": true,
+                                            "allowNull": false
+                                        },
+                                        {
+                                            "name": "USER_ID",
+                                            "required": true,
+                                            "allowNull": false
+                                        },
+                                        {
+                                            "name": "TYPE",
+                                            "required": true,
+                                            "allowNull": false
+                                        },
+                                        {
+                                            "name": "RECORD_TIMESTAMP",
+                                            "type": "date",
+                                            "required": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "inputs": [
+                        {
+                            "from": [
+                                "startDate"
+                            ],
+                            "to": [
+                                "selectAllAttendanceInPeriodInput",
+                                "startDate"
+                            ]
+                        },
+                        {
+                            "from": [
+                                "endDate"
+                            ],
+                            "to": [
+                                "selectAllAttendanceInPeriodInput",
+                                "endDate"
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "from": [
+                                "selectAllAttendanceInPeriodInputCursor"
+                            ],
+                            "to": [
+                                "attendanceCursor"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "200",
+                            "to": [
+                                "responseCode"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "iterate",
+                    "comments": "map the attendance cursor to the attendance output",
+                    "input": {
+                        "path": [
+                            "attendanceCursor"
+                        ]
+                    },
+                    "output": {
+                        "path": [
+                            "attendance"
+                        ]
+                    },
+                    "children": [
+                        {
+                            "comments": "map the data from the attendance cursor to the attendance model",
+                            "lines": [
+                                {
+                                    "from": [
+                                        "attendanceCursor",
+                                        "ID"
+                                    ],
+                                    "to": [
+                                        "attendance",
+                                        "id"
+                                    ]
+                                },
+                                {
+                                    "from": [
+                                        "attendanceCursor",
+                                        "TYPE"
+                                    ],
+                                    "to": [
+                                        "attendance",
+                                        "type"
+                                    ]
+                                },
+                                {
+                                    "from": [
+                                        "attendanceCursor",
+                                        "RECORD_TIMESTAMP"
+                                    ],
+                                    "to": [
+                                        "attendance",
+                                        "timestamp"
+                                    ]
+                                },
+                                {
+                                    "from": [
+                                        "attendanceCursor",
+                                        "USER_ID"
+                                    ],
+                                    "to": [
+                                        "attendance",
+                                        "userId"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "catch": [
+                {
+                    "type": "invokeCode",
+                    "comments": "log the exception received",
+                    "className": "io.toro.martini.LoggerMethods",
+                    "methodName": "error",
+                    "parameters": [
+                        "java.lang.String",
+                        "java.lang.Throwable"
+                    ],
+                    "inputs": [
+                        {
+                            "from": [
+                                "$gloopException",
+                                "gloopStackTrace"
+                            ],
+                            "to": [
+                                "message"
+                            ]
+                        },
+                        {
+                            "from": [
+                                "$gloopException",
+                                "realException"
+                            ],
+                            "to": [
+                                "throwable"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "comments": "map the appropriate error response",
+                    "lines": [
+                        {
+                            "from": [
+                                "$gloopException",
+                                "message"
+                            ],
+                            "to": [
+                                "response",
+                                "message"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "500",
+                            "to": [
+                                "responseCode"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "ERROR",
+                            "to": [
+                                "response",
+                                "result"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

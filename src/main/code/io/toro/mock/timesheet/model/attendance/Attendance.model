@@ -1,0 +1,17 @@
+{
+    "name": "Attendance",
+    "type": "model",
+    "gloopProperties": [
+        {
+            "name": "type",
+            "choices": [
+                "TIME IN",
+                "TIME OUT"
+            ]
+        },
+        {
+            "name": "timestamp",
+            "type": "date"
+        }
+    ]
+}

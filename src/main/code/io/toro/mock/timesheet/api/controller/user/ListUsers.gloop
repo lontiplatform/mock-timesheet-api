@@ -1,0 +1,181 @@
+{
+    "comments": "This service lists the users from the database.",
+    "output": [
+        {
+            "name": "users",
+            "type": "model",
+            "array": true,
+            "reference": "io.toro.mock.timesheet.model.user.User",
+            "gloopProperties": [
+                {
+                    "name": "id"
+                }
+            ]
+        },
+        {
+            "name": "response",
+            "type": "model",
+            "reference": "io.toro.mock.timesheet.model.APIResponse"
+        },
+        {
+            "name": "responseCode",
+            "type": "integer"
+        }
+    ],
+    "steps": [
+        {
+            "type": "block",
+            "blockType": "TRY_CATCH",
+            "children": [
+                {
+                    "type": "invokeGloop",
+                    "comments": "fetch users from the database",
+                    "name": "io.toro.mock.timesheet.sql.user.SelectAllUsers",
+                    "declare": [
+                        {
+                            "variables": [
+                                {
+                                    "name": "usersCursor",
+                                    "type": "model",
+                                    "array": true,
+                                    "gloopProperties": [
+                                        {
+                                            "name": "ID",
+                                            "required": true,
+                                            "allowNull": false
+                                        },
+                                        {
+                                            "name": "NAME",
+                                            "required": true,
+                                            "allowNull": false
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "from": [
+                                "selectAllUsersInputCursor"
+                            ],
+                            "to": [
+                                "usersCursor"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "200",
+                            "to": [
+                                "responseCode"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "iterate",
+                    "comments": "map the cursor to the output",
+                    "input": {
+                        "path": [
+                            "usersCursor"
+                        ]
+                    },
+                    "output": {
+                        "path": [
+                            "users"
+                        ]
+                    },
+                    "children": [
+                        {
+                            "comments": "map the data from the cursor to the output model",
+                            "lines": [
+                                {
+                                    "from": [
+                                        "usersCursor",
+                                        "ID"
+                                    ],
+                                    "to": [
+                                        "users",
+                                        "id"
+                                    ]
+                                },
+                                {
+                                    "from": [
+                                        "usersCursor",
+                                        "NAME"
+                                    ],
+                                    "to": [
+                                        "users",
+                                        "name"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "catch": [
+                {
+                    "type": "invokeCode",
+                    "comments": "log the exception received",
+                    "className": "io.toro.martini.LoggerMethods",
+                    "methodName": "error",
+                    "parameters": [
+                        "java.lang.String",
+                        "java.lang.Throwable"
+                    ],
+                    "inputs": [
+                        {
+                            "from": [
+                                "$gloopException",
+                                "gloopStackTrace"
+                            ],
+                            "to": [
+                                "message"
+                            ]
+                        },
+                        {
+                            "from": [
+                                "$gloopException",
+                                "realException"
+                            ],
+                            "to": [
+                                "throwable"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "comments": "map the appropriate error response",
+                    "lines": [
+                        {
+                            "type": "set",
+                            "expression": "500",
+                            "to": [
+                                "responseCode"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "ERROR",
+                            "to": [
+                                "response",
+                                "result"
+                            ]
+                        },
+                        {
+                            "from": [
+                                "$gloopException",
+                                "message"
+                            ],
+                            "to": [
+                                "response",
+                                "message"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

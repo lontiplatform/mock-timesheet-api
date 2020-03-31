@@ -1,0 +1,58 @@
+{
+    "type": "customSql",
+    "input": [
+        {
+            "name": "selectAllAttendanceInPeriodInput",
+            "type": "model",
+            "gloopProperties": [
+                {
+                    "name": "$martiniConnectionPool"
+                },
+                {
+                    "name": "$limit",
+                    "type": "integer"
+                },
+                {
+                    "name": "startDate",
+                    "type": "date"
+                },
+                {
+                    "name": "endDate",
+                    "type": "date"
+                }
+            ]
+        }
+    ],
+    "output": [
+        {
+            "name": "selectAllAttendanceInPeriodInputCursor",
+            "type": "model",
+            "array": true,
+            "gloopProperties": [
+                {
+                    "name": "ID",
+                    "required": true,
+                    "allowNull": false
+                },
+                {
+                    "name": "USER_ID",
+                    "required": true,
+                    "allowNull": false
+                },
+                {
+                    "name": "TYPE",
+                    "required": true,
+                    "allowNull": false
+                },
+                {
+                    "name": "RECORD_TIMESTAMP",
+                    "type": "date",
+                    "required": true
+                }
+            ]
+        }
+    ],
+    "connectionPoolName": "mock_timesheet_api",
+    "sqlType": "SELECT_MULTI",
+    "query": "SELECT *\nFROM\n    \"ATTENDANCE\"\nWHERE (\n    \"RECORD_TIMESTAMP\" BETWEEN :startDate AND :endDate\n)"
+}

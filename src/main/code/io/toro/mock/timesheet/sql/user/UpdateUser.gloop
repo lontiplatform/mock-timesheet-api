@@ -1,0 +1,29 @@
+{
+    "type": "customSql",
+    "input": [
+        {
+            "name": "updateUserInput",
+            "type": "model",
+            "gloopProperties": [
+                {
+                    "name": "$martiniConnectionPool"
+                },
+                {
+                    "name": "name"
+                },
+                {
+                    "name": "id"
+                }
+            ]
+        }
+    ],
+    "output": [
+        {
+            "name": "updateCount",
+            "type": "integer"
+        }
+    ],
+    "connectionPoolName": "mock_timesheet_api",
+    "sqlType": "UPDATE",
+    "query": "UPDATE \"USERS\"\nSET\n    \"NAME\" = COALESCE( :name, \"NAME\" )\nWHERE (\n    \"ID\" = :id\n)"
+}

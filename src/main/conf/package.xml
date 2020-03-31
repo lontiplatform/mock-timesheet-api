@@ -1,0 +1,9 @@
+<package stateOnStartup="started" id="mock-timesheet-api" version="1.0.0" context-path="/mock-timesheet-api">
+  <package-dependencies/>
+  <startup-services>
+    <startup-service>gloop:io.toro.mock.timesheet.config.CreateDatabaseConnection/io.toro.mock.timesheet.config.CreateDatabaseConnection</startup-service>
+  </startup-services>
+  <shutdown-services>
+    <shutdown-service>gloop:io.toro.mock.timesheet.config.DeleteDatabaseConnection/io.toro.mock.timesheet.config.DeleteDatabaseConnection</shutdown-service>
+  </shutdown-services>
+</package>
