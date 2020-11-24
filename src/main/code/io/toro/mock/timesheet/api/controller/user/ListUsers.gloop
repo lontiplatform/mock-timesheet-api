@@ -1,25 +1,31 @@
 {
-    "comments": "This service lists the users from the database.",
     "output": [
         {
-            "name": "users",
+            "name": "response",
             "type": "model",
-            "array": true,
-            "reference": "io.toro.mock.timesheet.model.user.User",
+            "reference": "io.toro.mock.timesheet.model.APIResponse",
             "gloopProperties": [
                 {
-                    "name": "id"
+                    "name": "users",
+                    "type": "model",
+                    "array": true,
+                    "reference": "io.toro.mock.timesheet.model.user.User",
+                    "gloopProperties": [
+                        {
+                            "name": "id"
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "response",
-            "type": "model",
-            "reference": "io.toro.mock.timesheet.model.APIResponse"
-        },
-        {
             "name": "responseCode",
             "type": "integer"
+        },
+        {
+            "name": "APIException",
+            "type": "model",
+            "reference": "io.toro.martini.api.APIException"
         }
     ],
     "steps": [
@@ -69,6 +75,22 @@
                             "to": [
                                 "responseCode"
                             ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "SUCCESS",
+                            "to": [
+                                "response",
+                                "result"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "Users fecthed successfully.",
+                            "to": [
+                                "response",
+                                "message"
+                            ]
                         }
                     ]
                 },
@@ -82,6 +104,7 @@
                     },
                     "output": {
                         "path": [
+                            "response",
                             "users"
                         ]
                     },
@@ -95,6 +118,7 @@
                                         "ID"
                                     ],
                                     "to": [
+                                        "response",
                                         "users",
                                         "id"
                                     ]
@@ -105,6 +129,7 @@
                                         "NAME"
                                     ],
                                     "to": [
+                                        "response",
                                         "users",
                                         "name"
                                     ]
@@ -159,17 +184,23 @@
                             "type": "set",
                             "expression": "ERROR",
                             "to": [
-                                "response",
+                                "APIException",
                                 "result"
                             ]
                         },
                         {
-                            "from": [
-                                "$gloopException",
-                                "message"
-                            ],
+                            "type": "set",
+                            "expression": "500",
                             "to": [
-                                "response",
+                                "APIException",
+                                "httpErrorCode"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "Encountered an exception while processing the request.",
+                            "to": [
+                                "APIException",
                                 "message"
                             ]
                         }

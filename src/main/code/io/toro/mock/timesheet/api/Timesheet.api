@@ -1,7 +1,13 @@
 {
+    "authTypes": [
+        "BASIC"
+    ],
+    "groups": [
+        "ESBAPIAdminGroup"
+    ],
     "info": {
         "title": "Mock Timesheet API",
-        "description": "A mock timesheet API.",
+        "description": "This is a sample timesheet api. This can be used for mocking or testing APIs.\n\n### Sending Authenticated Requests\n\nYou can use your ECC account to send authenticated request to the API. Your ECC credentials must be sent in the `Authorization` header in the HTTP request\n\n#### To authenticate a request with basic authentication\n\n1. Combine your email and password with a colon (`:`). e.g. `jdoe@mailinator.com:pa$$w0rd`\n2. Encode the resulting string in Base64\n3. Include an Authorization header in the HTTP request containing the base64-encoded string. Example: ```\nAuthorization: Basic amRvZUBtYWlsaW5hdG9yLmNvbTpwYSQkdzByZA==```",
         "license": {
             "name": "MIT"
         },
@@ -12,18 +18,30 @@
         "/users": {
             "description": "Users endpoint for viewing creating users and viewing users list.",
             "get": {
+                "tags": [
+                    "Users"
+                ],
                 "summary": "Retrieves all users.",
+                "description": "Fetches all the user in the api.",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "body": "users",
-                        "description": "Returns a list of users."
-                    },
-                    "-1": {
                         "body": "response",
-                        "description": "Returns the default response."
+                        "description": "If the request is successful",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Users fecthed successfully.\",\n    \"users\": [\n        {\n            \"name\": \"Romeo Wavish\",\n            \"id\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n        },\n        {\n            \"name\": \"Slade Klampk\",\n            \"id\": \"7d9fcc44-530d-4307-a6b2-e6202d582bdb\"\n        },\n        {\n            \"name\": \"Celestyn Eadmead\",\n            \"id\": \"8acd811b-9b1c-42fc-83cf-ab5a8265d38c\"\n        }\n    ]\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -31,6 +49,9 @@
                 "responseCodeField": "responseCode"
             },
             "post": {
+                "tags": [
+                    "Users"
+                ],
                 "summary": "Creates a single user.",
                 "consumes": [
                     "application/json"
@@ -43,9 +64,21 @@
                     "description": "The user data."
                 },
                 "responses": {
-                    "-1": {
+                    "201": {
                         "body": "response",
-                        "description": "Returns the status of the user creation."
+                        "description": "If the user was created successfully.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Successfully created user with id: 957af7e2-e4ae-417c-92ff-80f9fc100b3c\",\n    \"user\": {\n        \"name\": \"John Doe\",\n        \"id\": \"957af7e2-e4ae-417c-92ff-80f9fc100b3c\"\n    }\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -56,7 +89,11 @@
         "/users/{userId}": {
             "description": "User endpoint for viewing, updating, and deleting a specific user.",
             "get": {
+                "tags": [
+                    "Users"
+                ],
                 "summary": "Fetches a single user.",
+                "description": "Retrieves a single user record",
                 "produces": [
                     "application/json"
                 ],
@@ -69,12 +106,28 @@
                 ],
                 "responses": {
                     "200": {
-                        "body": "user",
-                        "description": "Returns information about the user."
-                    },
-                    "-1": {
                         "body": "response",
-                        "description": "Returns the error response."
+                        "description": "If the request is successful.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"user\": {\n        \"name\": \"Romeo Wavish\",\n        \"id\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n    }\n}"
+                        }
+                    },
+                    "404": {
+                        "body": "APIException",
+                        "description": "Returns the error response.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 404,\n    \"message\": \"User not found\"\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encounters an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an error while processing the request.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -82,6 +135,9 @@
                 "responseCodeField": "responseCode"
             },
             "put": {
+                "tags": [
+                    "Users"
+                ],
                 "summary": "Updates a single user.",
                 "consumes": [
                     "application/json"
@@ -101,9 +157,29 @@
                     "description": "The new user data to replace the current one."
                 },
                 "responses": {
-                    "-1": {
+                    "200": {
                         "body": "response",
-                        "description": "Returns the status of the user update."
+                        "description": "If the update is successful",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Successfully updated user with id: 6003165b-a3c5-426b-a659-ce1595bffec9\",\n    \"user\": {\n        \"name\": \"Romeo Wavish\",\n        \"id\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n    }\n}"
+                        }
+                    },
+                    "404": {
+                        "body": "APIException",
+                        "description": "If the user does not exist",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 404,\n    \"message\": \"User not found\"\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an error while processing the request",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -111,7 +187,11 @@
                 "responseCodeField": "responseCode"
             },
             "delete": {
+                "tags": [
+                    "Users"
+                ],
                 "summary": "Deletes a single user.",
+                "description": "Removes a user record in the api.",
                 "produces": [
                     "application/json"
                 ],
@@ -123,9 +203,29 @@
                     }
                 ],
                 "responses": {
-                    "-1": {
+                    "200": {
                         "body": "response",
-                        "description": "Returns the status of the user deletion."
+                        "description": "If the delete request is successful.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Successfully deleted user with id: c6f8174a-23f6-44ff-8480-976876986061\"\n}"
+                        }
+                    },
+                    "404": {
+                        "body": "APIException",
+                        "description": "If the user does not exist or not found.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 404,\n    \"message\": \"User not found.\"\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -136,7 +236,11 @@
         "/users/{userId}/attendance": {
             "description": "User endpoint for creating and viewing a specific user's attendance records.",
             "get": {
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Fetches the user's attendance.",
+                "description": "Retrieves all attendance record for the given user id.",
                 "produces": [
                     "application/json"
                 ],
@@ -144,7 +248,7 @@
                     {
                         "name": "userId",
                         "type": "PATH",
-                        "description": "The ID of the user whose attendance to fetch."
+                        "description": "The ID of the user who owns attendance to fetch."
                     },
                     {
                         "name": "startDate",
@@ -159,12 +263,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "body": "attendance",
-                        "description": "Returns the list of user attendance."
+                        "body": "response",
+                        "description": "Returns the list of user attendance.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Successfully fetched attendance for period Wed May 02 00:00:00 PST 2018 - Wed Mar 11 00:00:00 PST 2020\",\n    \"attendance\": [\n        {\n            \"type\": \"TIME OUT\",\n            \"timestamp\": \"2019-10-02T19:45:36+0800\",\n            \"id\": \"2db87c3f-f512-45c5-919e-53212ff82549\",\n            \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n        },\n        {\n            \"type\": \"TIME OUT\",\n            \"timestamp\": \"2019-10-03T17:01:03+0800\",\n            \"id\": \"62fc08db-695f-4534-979e-4dcd8dc8b4b7\",\n            \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n        },\n        {\n            \"type\": \"TIME IN\",\n            \"timestamp\": \"2019-10-02T06:38:12+0800\",\n            \"id\": \"79ac68bd-f55f-45ac-8ea1-d4398189ff36\",\n            \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n        },\n        {\n            \"type\": \"TIME IN\",\n            \"timestamp\": \"2019-10-03T07:51:57+0800\",\n            \"id\": \"7e2a31ae-39ac-49ee-8266-778764db18de\",\n            \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n        },\n        {\n            \"type\": \"TIME OUT\",\n            \"timestamp\": \"2019-10-01T17:07:46+0800\",\n            \"id\": \"c6f8174a-23f6-44ff-8480-976876986061\",\n            \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n        },\n        {\n            \"type\": \"TIME IN\",\n            \"timestamp\": \"2019-10-01T07:55:17+0800\",\n            \"id\": \"e8c92818-a3a5-41ad-80bd-c350c1111966\",\n            \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n        }\n    ]\n}"
+                        }
                     },
-                    "-1": {
-                        "body": "error",
-                        "description": "Returns the error response."
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encounterd an error exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -172,7 +284,11 @@
                 "responseCodeField": "responseCode"
             },
             "post": {
-                "summary": "Creates a record of the user's attendance.",
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Create a record of the user's attendance.",
+                "description": "Adds a new attendance record for the given user id.",
                 "consumes": [
                     "application/json"
                 ],
@@ -191,9 +307,37 @@
                     "description": "The attendance data to create."
                 },
                 "responses": {
-                    "-1": {
+                    "200": {
                         "body": "response",
-                        "description": "Returns the status of the user attendance creation."
+                        "description": "Returns the status of the user attendance creation.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Successfully recorded 'TIME OUT' attendance 'caedbe7e-d8a6-4105-9cf1-2af9a79b8bfc' of user '6003165b-a3c5-426b-a659-ce1595bffec9' on 'Wed Oct 02 07:45:17 PST 2019'\",\n    \"attendance\": {\n        \"type\": \"TIME OUT\",\n        \"timestamp\": \"2019-10-02T19:45:36+0800\",\n        \"id\": \"2db87c3f-f512-45c5-919e-53212ff82549\",\n        \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n    }\n}"
+                        }
+                    },
+                    "400": {
+                        "body": "APIException",
+                        "description": "If the attendance failed to be created",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 400,\n    \"message\": \"Encountered an error while processing the request. See logs for more info.\"\n}"
+                        }
+                    },
+                    "404": {
+                        "body": "APIException",
+                        "description": "If the user in which the attendance will be added is not found or does not exist.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 404,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -204,7 +348,11 @@
         "/attendance": {
             "description": "Attendance endpoint for viewing a list of attendance records.",
             "get": {
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Fetches a list of attendance records.",
+                "description": "Lists all attendance for all users.",
                 "produces": [
                     "application/json"
                 ],
@@ -222,12 +370,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "body": "attendance",
-                        "description": "Returns the list of attendance."
-                    },
-                    "-1": {
                         "body": "response",
-                        "description": "Returns the error response."
+                        "description": "Returns the list of attendance.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"response\": {\n        \"result\": \"SUCCESS\",\n        \"message\": \"Fetched all attendance for given period.\",\n        \"attendance\": [\n            {\n                \"type\": \"TIME IN\",\n                \"timestamp\": \"2019-10-03T01:11:25+0000\",\n                \"id\": \"034dfe94-acdd-4ad9-9544-50451d5129d6\",\n                \"userId\": \"8acd811b-9b1c-42fc-83cf-ab5a8265d38c\"\n            },\n            {\n                \"type\": \"TIME IN\",\n                \"timestamp\": \"2019-10-02T23:56:44+0000\",\n                \"id\": \"1b4764ea-89b5-44d4-b73c-5bddd5217c23\",\n                \"userId\": \"7d9fcc44-530d-4307-a6b2-e6202d582bdb\"\n            },\n            {\n                \"type\": \"TIME IN\",\n                \"timestamp\": \"2019-10-01T23:51:27+0000\",\n                \"id\": \"d23d393e-ac4a-42a2-8e35-af9ff2a341e0\",\n                \"userId\": \"8acd811b-9b1c-42fc-83cf-ab5a8265d38c\"\n            },\n            {\n                \"type\": \"TIME IN\",\n                \"timestamp\": \"2019-09-30T23:55:17+0000\",\n                \"id\": \"e8c92818-a3a5-41ad-80bd-c350c1111966\",\n                \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n            }\n        ]\n    }\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "Returns the error response.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -238,7 +394,11 @@
         "/attendance/{id}": {
             "description": "Attendance endpoint for viewing, updating, and deleting a specific attendance record.",
             "get": {
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Fetches a single attendance record.",
+                "description": "Retrieves a single attendance record in the api.",
                 "produces": [
                     "application/json"
                 ],
@@ -251,12 +411,28 @@
                 ],
                 "responses": {
                     "200": {
-                        "body": "attendance",
-                        "description": "Returns the details about the attendance."
+                        "body": "response",
+                        "description": "If the request is successful.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Attendance fetched sucessfully.\",\n    \"attendance\": {\n        \"type\": \"TIME OUT\",\n        \"timestamp\": \"2019-10-02T19:45:36+0800\",\n        \"id\": \"2db87c3f-f512-45c5-919e-53212ff82549\",\n        \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n    }\n}"
+                        }
                     },
-                    "-1": {
-                        "body": "error",
-                        "description": "Returns the error response.\n"
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
+                    },
+                    "404": {
+                        "body": "APIException",
+                        "description": "If the attendance does not exist or not found.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 404,\n    \"message\": \"Attendance record not found.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -264,7 +440,13 @@
                 "responseCodeField": "responseCode"
             },
             "put": {
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Updates a single attendance record.",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -280,9 +462,29 @@
                     "description": "The new data of the attendance record to replace the current one."
                 },
                 "responses": {
-                    "-1": {
+                    "200": {
                         "body": "response",
-                        "description": "Returns the status of the attendance update."
+                        "description": "If the request is successful",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Attendance successfully updated.\",\n    \"attendance\": {\n        \"type\": \"TIME IN\",\n        \"timestamp\": \"2019-10-01T17:07:46+0800\",\n        \"id\": \"c6f8174a-23f6-44ff-8480-976876986061\",\n        \"userId\": \"6003165b-a3c5-426b-a659-ce1595bffec9\"\n    }\n}"
+                        }
+                    },
+                    "404": {
+                        "body": "APIException",
+                        "description": "If the attendance to be updated could not be found.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 404,\n    \"message\": \"Attendance with id 8acd811b-9b1c-42fc-83cf-ab5a8265d38c not found.\"\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -290,6 +492,9 @@
                 "responseCodeField": "responseCode"
             },
             "delete": {
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Deletes a single attendance record.",
                 "produces": [
                     "application/json"
@@ -302,9 +507,29 @@
                     }
                 ],
                 "responses": {
-                    "-1": {
+                    "200": {
                         "body": "response",
-                        "description": "Returns the status of the attendance deletion."
+                        "description": "Returns the status of the attendance deletion.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"SUCCESS\",\n    \"message\": \"Successfully deleted attendance with id: c6f8174a-23f6-44ff-8480-976876986061\"\n}"
+                        }
+                    },
+                    "404": {
+                        "body": "APIException",
+                        "description": "If the attendance to be deleted does not exist.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 404,\n    \"message\": \"Attendance with id 6003165b-a3c5-426b-a659-ce1595bffec9 not found.\"\n}"
+                        }
+                    },
+                    "500": {
+                        "body": "APIException",
+                        "description": "If the server encountered an exception while processing the request.",
+                        "responseBodyMockData": {
+                            "mockDataType": "JSON",
+                            "mockData": "{\n    \"result\": \"ERROR\",\n    \"httpErrorCode\": 500,\n    \"message\": \"Encountered an exception while processing the request.\"\n}"
+                        }
                     }
                 },
                 "operationType": "gloop",
@@ -313,7 +538,24 @@
             }
         }
     },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Operations related to fetching, creating, updating, and deleting users",
+            "externalDocumentation": {
+                "url": "http://example.com"
+            }
+        },
+        {
+            "name": "Attendance",
+            "description": "Operations related to viewing, adding, and modifying attendance",
+            "externalDocumentation": {
+                "url": "https://example.com"
+            }
+        }
+    ],
     "externalDocumentation": {
-        "url": "http://example.com"
+        "url": "http://example.com",
+        "description": "This is a non-production Timesheet REST API server, it aims to be used for mocking or testing APIs. \n\n### Sending Authenticated Requests\n\nYou can use your ECC account to send authenticated request to the API. Your ECC credentials must be sent in the `Authorization` header in the HTTP request\n\n#### To authenticate a request with basic authentication\n\n1. Combine your email and password with a colon (`:`). e.g. `jdoe@mailinator.com:pa$$w0rd`\n2. Encode the resulting string in Base64\n3. Include an Authorization header in the HTTP request containing the base64-encoded string. Example: ```\nAuthorization: Basic amRvZUBtYWlsaW5hdG9yLmNvbTpwYSQkdzByZA==```"
     }
 }

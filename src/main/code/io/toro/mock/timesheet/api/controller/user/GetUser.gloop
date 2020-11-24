@@ -1,5 +1,4 @@
 {
-    "comments": "This service fetches the user data from the database.",
     "input": [
         {
             "name": "userId"
@@ -7,23 +6,30 @@
     ],
     "output": [
         {
-            "name": "user",
+            "name": "response",
             "type": "model",
-            "reference": "io.toro.mock.timesheet.model.user.User",
+            "reference": "io.toro.mock.timesheet.model.APIResponse",
             "gloopProperties": [
                 {
-                    "name": "id"
+                    "name": "user",
+                    "type": "model",
+                    "reference": "io.toro.mock.timesheet.model.user.User",
+                    "gloopProperties": [
+                        {
+                            "name": "id"
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "response",
-            "type": "model",
-            "reference": "io.toro.mock.timesheet.model.APIResponse"
-        },
-        {
             "name": "responseCode",
             "type": "integer"
+        },
+        {
+            "name": "APIException",
+            "type": "model",
+            "reference": "io.toro.martini.api.APIException"
         }
     ],
     "steps": [
@@ -53,6 +59,7 @@
                                 "ID"
                             ],
                             "to": [
+                                "response",
                                 "user",
                                 "id"
                             ]
@@ -63,6 +70,7 @@
                                 "NAME"
                             ],
                             "to": [
+                                "response",
                                 "user",
                                 "name"
                             ]
@@ -72,6 +80,48 @@
                             "expression": "200",
                             "to": [
                                 "responseCode"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "fork",
+                    "expression": "org.apache.commons.lang3.StringUtils.isEmpty( response?.user?.id )",
+                    "children": [
+                        {
+                            "label": "true",
+                            "lines": [
+                                {
+                                    "type": "set",
+                                    "expression": "ERROR",
+                                    "to": [
+                                        "APIException",
+                                        "result"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "404",
+                                    "to": [
+                                        "APIException",
+                                        "httpErrorCode"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "User not found",
+                                    "to": [
+                                        "APIException",
+                                        "message"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "404",
+                                    "to": [
+                                        "responseCode"
+                                    ]
+                                }
                             ]
                         }
                     ]
@@ -106,11 +156,30 @@
                                 "throwable"
                             ]
                         }
+                    ],
+                    "outputs": [
+                        {
+                            "type": "set",
+                            "expression": "500",
+                            "to": [
+                                "responseCode"
+                            ]
+                        }
                     ]
                 },
                 {
                     "comments": "map the appropriate error response",
                     "lines": [
+                        {
+                            "from": [
+                                "$gloopException",
+                                "message"
+                            ],
+                            "to": [
+                                "response",
+                                "message"
+                            ]
+                        },
                         {
                             "type": "set",
                             "expression": "500",
@@ -127,12 +196,26 @@
                             ]
                         },
                         {
-                            "from": [
-                                "$gloopException",
-                                "message"
-                            ],
+                            "type": "set",
+                            "expression": "ERROR",
                             "to": [
-                                "response",
+                                "APIException",
+                                "result"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "500",
+                            "to": [
+                                "APIException",
+                                "httpErrorCode"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "Encountered an exception while processing the request.",
+                            "to": [
+                                "APIException",
                                 "message"
                             ]
                         }

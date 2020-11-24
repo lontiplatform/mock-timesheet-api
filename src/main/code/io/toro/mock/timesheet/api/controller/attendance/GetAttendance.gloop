@@ -1,5 +1,4 @@
 {
-    "comments": "This service fetches the attendance from the database by its ID.",
     "input": [
         {
             "name": "id"
@@ -7,26 +6,33 @@
     ],
     "output": [
         {
-            "name": "attendance",
+            "name": "responseCode",
+            "type": "integer"
+        },
+        {
+            "name": "response",
             "type": "model",
-            "reference": "io.toro.mock.timesheet.model.attendance.Attendance",
+            "reference": "io.toro.mock.timesheet.model.APIResponse",
             "gloopProperties": [
                 {
-                    "name": "id"
-                },
-                {
-                    "name": "userId"
+                    "name": "attendance",
+                    "type": "model",
+                    "reference": "io.toro.mock.timesheet.model.attendance.Attendance",
+                    "gloopProperties": [
+                        {
+                            "name": "id"
+                        },
+                        {
+                            "name": "userId"
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "error",
+            "name": "APIException",
             "type": "model",
-            "reference": "io.toro.martini.api.APIResponse"
-        },
-        {
-            "name": "responseCode",
-            "type": "integer"
+            "reference": "io.toro.martini.api.APIException"
         }
     ],
     "steps": [
@@ -56,8 +62,20 @@
                                 "ID"
                             ],
                             "to": [
+                                "response",
                                 "attendance",
                                 "id"
+                            ]
+                        },
+                        {
+                            "from": [
+                                "selectAttendanceOutput",
+                                "USER_ID"
+                            ],
+                            "to": [
+                                "response",
+                                "attendance",
+                                "userId"
                             ]
                         },
                         {
@@ -66,6 +84,7 @@
                                 "TYPE"
                             ],
                             "to": [
+                                "response",
                                 "attendance",
                                 "type"
                             ]
@@ -76,6 +95,7 @@
                                 "RECORD_TIMESTAMP"
                             ],
                             "to": [
+                                "response",
                                 "attendance",
                                 "timestamp"
                             ]
@@ -86,15 +106,47 @@
                             "to": [
                                 "responseCode"
                             ]
-                        },
+                        }
+                    ]
+                },
+                {
+                    "type": "fork",
+                    "expression": "response?.attendance?.id != null",
+                    "children": [
                         {
-                            "from": [
-                                "selectAttendanceOutput",
-                                "USER_ID"
-                            ],
-                            "to": [
-                                "attendance",
-                                "userId"
+                            "label": "false",
+                            "lines": [
+                                {
+                                    "type": "set",
+                                    "expression": "ERROR",
+                                    "to": [
+                                        "APIException",
+                                        "result"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "404",
+                                    "to": [
+                                        "APIException",
+                                        "httpErrorCode"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "Attendance record not found.",
+                                    "to": [
+                                        "APIException",
+                                        "message"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "404",
+                                    "to": [
+                                        "responseCode"
+                                    ]
+                                }
                             ]
                         }
                     ]
@@ -135,16 +187,6 @@
                     "comments": "map the appropriate error response",
                     "lines": [
                         {
-                            "from": [
-                                "$gloopException",
-                                "message"
-                            ],
-                            "to": [
-                                "error",
-                                "message"
-                            ]
-                        },
-                        {
                             "type": "set",
                             "expression": "500",
                             "to": [
@@ -155,8 +197,24 @@
                             "type": "set",
                             "expression": "ERROR",
                             "to": [
-                                "error",
+                                "APIException",
                                 "result"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "500",
+                            "to": [
+                                "APIException",
+                                "httpErrorCode"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "Encountered an exception while processing the request",
+                            "to": [
+                                "APIException",
+                                "message"
                             ]
                         }
                     ]

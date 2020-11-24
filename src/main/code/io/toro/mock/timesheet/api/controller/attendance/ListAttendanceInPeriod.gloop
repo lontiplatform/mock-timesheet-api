@@ -1,38 +1,46 @@
 {
-    "comments": "This service lists attendance records within the given period.",
     "input": [
         {
             "name": "startDate",
-            "type": "date"
+            "type": "date",
+            "defaultValue": "now()"
         },
         {
             "name": "endDate",
-            "type": "date"
+            "type": "date",
+            "defaultValue": "now()"
         }
     ],
     "output": [
         {
-            "name": "attendance",
+            "name": "response",
             "type": "model",
-            "array": true,
-            "reference": "io.toro.mock.timesheet.model.attendance.Attendance",
+            "reference": "io.toro.mock.timesheet.model.APIResponse",
             "gloopProperties": [
                 {
-                    "name": "id"
-                },
-                {
-                    "name": "userId"
+                    "name": "attendance",
+                    "type": "model",
+                    "array": true,
+                    "reference": "io.toro.mock.timesheet.model.attendance.Attendance",
+                    "gloopProperties": [
+                        {
+                            "name": "id"
+                        },
+                        {
+                            "name": "userId"
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "response",
-            "type": "model",
-            "reference": "io.toro.mock.timesheet.model.APIResponse"
-        },
-        {
             "name": "responseCode",
             "type": "integer"
+        },
+        {
+            "name": "APIException",
+            "type": "model",
+            "reference": "io.toro.martini.api.APIException"
         }
     ],
     "steps": [
@@ -42,7 +50,6 @@
             "children": [
                 {
                     "type": "invokeGloop",
-                    "comments": "fetch the attendance records from the database",
                     "name": "io.toro.mock.timesheet.sql.attendance.SelectAllAttendanceInPeriod",
                     "declare": [
                         {
@@ -112,6 +119,22 @@
                             "to": [
                                 "responseCode"
                             ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "SUCCESS",
+                            "to": [
+                                "response",
+                                "result"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "Fetched all attendance for given period.",
+                            "to": [
+                                "response",
+                                "message"
+                            ]
                         }
                     ]
                 },
@@ -125,6 +148,7 @@
                     },
                     "output": {
                         "path": [
+                            "response",
                             "attendance"
                         ]
                     },
@@ -138,28 +162,9 @@
                                         "ID"
                                     ],
                                     "to": [
+                                        "response",
                                         "attendance",
                                         "id"
-                                    ]
-                                },
-                                {
-                                    "from": [
-                                        "attendanceCursor",
-                                        "TYPE"
-                                    ],
-                                    "to": [
-                                        "attendance",
-                                        "type"
-                                    ]
-                                },
-                                {
-                                    "from": [
-                                        "attendanceCursor",
-                                        "RECORD_TIMESTAMP"
-                                    ],
-                                    "to": [
-                                        "attendance",
-                                        "timestamp"
                                     ]
                                 },
                                 {
@@ -168,8 +173,31 @@
                                         "USER_ID"
                                     ],
                                     "to": [
+                                        "response",
                                         "attendance",
                                         "userId"
+                                    ]
+                                },
+                                {
+                                    "from": [
+                                        "attendanceCursor",
+                                        "RECORD_TIMESTAMP"
+                                    ],
+                                    "to": [
+                                        "response",
+                                        "attendance",
+                                        "timestamp"
+                                    ]
+                                },
+                                {
+                                    "from": [
+                                        "attendanceCursor",
+                                        "TYPE"
+                                    ],
+                                    "to": [
+                                        "response",
+                                        "attendance",
+                                        "type"
                                     ]
                                 }
                             ]
@@ -212,16 +240,6 @@
                     "comments": "map the appropriate error response",
                     "lines": [
                         {
-                            "from": [
-                                "$gloopException",
-                                "message"
-                            ],
-                            "to": [
-                                "response",
-                                "message"
-                            ]
-                        },
-                        {
                             "type": "set",
                             "expression": "500",
                             "to": [
@@ -232,8 +250,24 @@
                             "type": "set",
                             "expression": "ERROR",
                             "to": [
-                                "response",
+                                "APIException",
                                 "result"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "500",
+                            "to": [
+                                "APIException",
+                                "httpErrorCode"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "Encountered an exception while processing the request.",
+                            "to": [
+                                "APIException",
+                                "message"
                             ]
                         }
                     ]

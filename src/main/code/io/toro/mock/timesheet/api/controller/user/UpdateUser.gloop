@@ -14,11 +14,28 @@
         {
             "name": "response",
             "type": "model",
-            "reference": "io.toro.mock.timesheet.model.APIResponse"
+            "reference": "io.toro.mock.timesheet.model.APIResponse",
+            "gloopProperties": [
+                {
+                    "name": "user",
+                    "type": "model",
+                    "reference": "io.toro.mock.timesheet.model.user.User",
+                    "gloopProperties": [
+                        {
+                            "name": "id"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "name": "responseCode",
             "type": "integer"
+        },
+        {
+            "name": "APIException",
+            "type": "model",
+            "reference": "io.toro.martini.api.APIException"
         }
     ],
     "steps": [
@@ -28,52 +45,197 @@
             "children": [
                 {
                     "type": "invokeGloop",
-                    "comments": "update the user from the database",
-                    "name": "io.toro.mock.timesheet.sql.user.UpdateUser",
+                    "name": "io.toro.mock.timesheet.sql.user.SelectUser",
+                    "declare": [
+                        {
+                            "variables": [
+                                {
+                                    "name": "selectUserOutput",
+                                    "type": "model",
+                                    "gloopProperties": [
+                                        {
+                                            "name": "ID",
+                                            "required": true,
+                                            "allowNull": false
+                                        },
+                                        {
+                                            "name": "NAME",
+                                            "required": true,
+                                            "allowNull": false
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
                     "inputs": [
                         {
                             "from": [
                                 "userId"
                             ],
                             "to": [
-                                "updateUserInput",
+                                "selectUserInput",
                                 "id"
-                            ]
-                        },
-                        {
-                            "from": [
-                                "user",
-                                "name"
-                            ],
-                            "to": [
-                                "updateUserInput",
-                                "name"
                             ]
                         }
                     ],
                     "outputs": [
                         {
-                            "type": "set",
-                            "expression": "200",
+                            "from": [
+                                "selectUserOutput"
+                            ],
                             "to": [
-                                "responseCode"
+                                "selectUserOutput"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "fork",
+                    "expression": "selectUserOutput?.ID != null",
+                    "children": [
+                        {
+                            "type": "block",
+                            "label": "true",
+                            "children": [
+                                {
+                                    "type": "invokeGloop",
+                                    "comments": "update the user from the database",
+                                    "name": "io.toro.mock.timesheet.sql.user.UpdateUser",
+                                    "declare": [
+                                        {
+                                            "variables": [
+                                                {
+                                                    "name": "updateCount",
+                                                    "type": "integer"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "inputs": [
+                                        {
+                                            "from": [
+                                                "userId"
+                                            ],
+                                            "to": [
+                                                "updateUserInput",
+                                                "id"
+                                            ]
+                                        },
+                                        {
+                                            "from": [
+                                                "user",
+                                                "name"
+                                            ],
+                                            "to": [
+                                                "updateUserInput",
+                                                "name"
+                                            ]
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "from": [
+                                                "updateCount"
+                                            ],
+                                            "to": [
+                                                "updateCount"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "fork",
+                                    "expression": "updateCount > 0",
+                                    "children": [
+                                        {
+                                            "label": "true",
+                                            "lines": [
+                                                {
+                                                    "type": "set",
+                                                    "expression": "SUCCESS",
+                                                    "to": [
+                                                        "response",
+                                                        "result"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "set",
+                                                    "expression": "\"Successfully updated user with id: ${userId}\"",
+                                                    "evaluate": true,
+                                                    "to": [
+                                                        "response",
+                                                        "message"
+                                                    ]
+                                                },
+                                                {
+                                                    "from": [
+                                                        "user",
+                                                        "name"
+                                                    ],
+                                                    "to": [
+                                                        "response",
+                                                        "user",
+                                                        "name"
+                                                    ]
+                                                },
+                                                {
+                                                    "from": [
+                                                        "userId"
+                                                    ],
+                                                    "to": [
+                                                        "response",
+                                                        "user",
+                                                        "id"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "set",
+                                                    "expression": "200",
+                                                    "to": [
+                                                        "responseCode"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
                             ]
                         },
                         {
-                            "type": "set",
-                            "expression": "SUCCESS",
-                            "to": [
-                                "response",
-                                "result"
-                            ]
-                        },
-                        {
-                            "type": "set",
-                            "expression": "\"Successfully updated user with id: ${userId}\"",
-                            "evaluate": true,
-                            "to": [
-                                "response",
-                                "message"
+                            "label": "false",
+                            "lines": [
+                                {
+                                    "type": "set",
+                                    "expression": "404",
+                                    "to": [
+                                        "responseCode"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "ERROR",
+                                    "to": [
+                                        "APIException",
+                                        "result"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "404",
+                                    "to": [
+                                        "APIException",
+                                        "httpErrorCode"
+                                    ]
+                                },
+                                {
+                                    "type": "set",
+                                    "expression": "User not found.",
+                                    "to": [
+                                        "APIException",
+                                        "message"
+                                    ]
+                                }
                             ]
                         }
                     ]
@@ -124,17 +286,23 @@
                             "type": "set",
                             "expression": "ERROR",
                             "to": [
-                                "response",
+                                "APIException",
                                 "result"
                             ]
                         },
                         {
-                            "from": [
-                                "$gloopException",
-                                "message"
-                            ],
+                            "type": "set",
+                            "expression": "500",
                             "to": [
-                                "response",
+                                "APIException",
+                                "httpErrorCode"
+                            ]
+                        },
+                        {
+                            "type": "set",
+                            "expression": "Encountered an error while processging the request.",
+                            "to": [
+                                "APIException",
                                 "message"
                             ]
                         }
