@@ -51,6 +51,7 @@
                         {
                             "type": "set",
                             "expression": "UUID.randomUUID()",
+                            "evaluate": true,
                             "to": [
                                 "response",
                                 "attendance",
@@ -196,7 +197,7 @@
                                         },
                                         {
                                             "type": "set",
-                                            "expression": "\"Successfully recorded '${attendance.type}' attendance '${id}' of user '${userId}' on '${attendance.timestamp}'\"",
+                                            "expression": "\"Successfully recorded '${attendance.type}' attendance '${response.attendance.id}' of user '${userId}' on '${attendance.timestamp}'\"",
                                             "evaluate": true,
                                             "to": [
                                                 "response",

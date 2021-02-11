@@ -11,7 +11,7 @@
         "license": {
             "name": "MIT"
         },
-        "version": "1.0.0-SNAPSHOT"
+        "version": "1.0.0"
     },
     "basePath": "/mock-timesheet-api",
     "paths": {

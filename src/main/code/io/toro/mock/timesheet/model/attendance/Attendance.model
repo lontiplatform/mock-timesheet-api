@@ -11,7 +11,10 @@
         },
         {
             "name": "timestamp",
-            "type": "date"
+            "type": "date",
+            "dateFormats": [
+                "yyyy-MM-dd'T'HH:mm:ss"
+            ]
         }
     ]
 }

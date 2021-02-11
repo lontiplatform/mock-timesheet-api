@@ -5,11 +5,17 @@
         },
         {
             "name": "startDate",
-            "type": "date"
+            "type": "date",
+            "dateFormats": [
+                "yyyy-MM-dd'T'HH:mm:ss"
+            ]
         },
         {
             "name": "endDate",
-            "type": "date"
+            "type": "date",
+            "dateFormats": [
+                "yyyy-MM-dd'T'HH:mm:ss"
+            ]
         }
     ],
     "output": [

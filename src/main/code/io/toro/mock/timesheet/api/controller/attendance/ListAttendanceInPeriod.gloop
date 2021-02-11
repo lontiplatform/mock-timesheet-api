@@ -3,12 +3,16 @@
         {
             "name": "startDate",
             "type": "date",
-            "defaultValue": "now()"
+            "dateFormats": [
+                "yyyy-MM-dd'T'HH:mm:ss"
+            ]
         },
         {
             "name": "endDate",
             "type": "date",
-            "defaultValue": "now()"
+            "dateFormats": [
+                "yyyy-MM-dd'T'HH:mm:ss"
+            ]
         }
     ],
     "output": [
