@@ -4,7 +4,7 @@ Issues can be submitted by anyone - seasoned developers or newbies.
 
 ### Getting Started
 
-1.  Fork the project on [GitHub](https://github.com/torocloud/mock-timesheet-api).
+1.  Fork the project on [GitHub](https://github.com/lontiplatform/mock-timesheet-api).
 
 2.  Clone the project.
 
